@@ -109,11 +109,17 @@ window.nv.tooltip.* also has various helper methods.
 
         //Creates new tooltip container, or uses existing one on DOM.
         function getTooltipContainer(newContent) {
-            var body;
+
+            var body = chartContainer;
+
+            while(/\[object SVG.*Element\]/g.test(body+""))body = body.parentNode;
+
             if (chartContainer)
-                body = d3.select(chartContainer);
+                body = d3.select(body);
             else
                 body = d3.select("body");
+
+
 
             var container = body.select(".nvtooltip");
             if (container.node() === null) {
