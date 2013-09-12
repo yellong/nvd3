@@ -285,7 +285,17 @@ window.nv.tooltip.* also has various helper methods.
         if ( !parentContainer || parentContainer.tagName.match(/g|svg/i)) {
             //If the parent element is an SVG element, place tooltip in the <body> element.
             body = document.getElementsByTagName('body')[0];
+
+            var realContainer = parentContainer;
+            while(/\[object SVG.*Element\]/g.test(realContainer+""))realContainer = realContainer.parentNode;
+            pos[0] += realContainer.offsetLeft;
+            pos[1] += realContainer.offsetTop;
         }
+
+          if(window.getComputedStyle(parentContainer).position === 'relative'){
+              pos[0] -= parentContainer.offsetLeft;
+              pos[1] -= parentContainer.offsetTop;
+          }
    
         container.style.left = 0;
         container.style.top = 0;
