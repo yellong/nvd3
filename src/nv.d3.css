@@ -751,3 +751,46 @@ Interactive Layer
 .nvd3 line.nv-guideline {
   stroke: #ccc;
 }
+
+/****
+radar Chart
+*/
+.nvd3 .nv-radar circle.background {
+    stroke: #DDD;
+    fill: #FFF;
+    stroke-width: 1;
+}
+.nvd3 .nv-radar .axis path {
+    fill: none;
+    stroke: #DDD;
+    stroke-width: 1;
+}
+.nvd3 .nv-radar .axisScale text{
+    display: none;
+}
+.nvd3 .nv-radar .axisScale line {
+    display: none;
+}
+.nvd3 .nv-radar .radar-area path {
+    transition: stroke-width 250ms linear, stroke-opacity 250ms linear, fill-opacity 250ms linear;
+    -moz-transition: stroke-width 250ms linear, stroke-opacity 250ms linear, fill-opacity 250ms linear;
+    -webkit-transition: stroke-width 250ms linear, stroke-opacity 250ms linear, fill-opacity 250ms linear;
+    stroke-width: 2;
+    fill-opacity: 0.2;
+    stroke-opacity: 0.5;
+}
+.nvd3 .nv-radar .radar-area path:hover {
+    stroke-width: 10;
+    stroke-opacity: 0.3;
+    fill-opacity: 0.4;
+}
+.nvd3 .nv-radar .radar-area .radar-point {
+    fill: #fff;
+}
+.nvd3 .nv-radar .axisLabel {
+    font: 10px sans-serif;
+    text-transform: capitalize;
+    /*text-anchor: middle;*/
+    fill: #333;
+    stroke: none;
+}
