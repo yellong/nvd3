@@ -287,9 +287,11 @@ window.nv.tooltip.* also has various helper methods.
             body = document.getElementsByTagName('body')[0];
 
             var realContainer = parentContainer;
-            while(/\[object SVG.*Element\]/g.test(realContainer+""))realContainer = realContainer.parentNode;
-            pos[0] += realContainer.offsetLeft;
-            pos[1] += realContainer.offsetTop;
+            if(realContainer){
+                while(/\[object SVG.*Element\]/g.test(realContainer+""))realContainer = realContainer.parentNode;
+                pos[0] += realContainer.offsetLeft;
+                pos[1] += realContainer.offsetTop;
+            }
         }
 
           if(window.getComputedStyle(parentContainer).position === 'relative'){
