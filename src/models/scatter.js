@@ -36,7 +36,7 @@ nv.models.scatter = function() {
     , sizeDomain   = null // Override point size domain
     , sizeRange    = null
     , singlePoint  = false
-    , dispatch     = d3.dispatch('elementClick', 'elementMouseover', 'elementMouseout')
+    , dispatch     = d3.dispatch('elementDblClick','elementClick', 'elementMouseover', 'elementMouseout')
     , useVoronoi   = true
     ;
 
@@ -259,9 +259,21 @@ nv.models.scatter = function() {
                 });
           };
 
+          //use to diff dblclick or click event
+          var  clickTimeout = null;
+
           pointPaths
               .on('click', function(d) {
-                mouseEventCallback(d, dispatch.elementClick);
+                  if(clickTimeout){
+                      window.clearTimeout(clickTimeout);
+                      clickTimeout = null;
+                      mouseEventCallback(d, dispatch.elementDblClick);
+                  }else{
+                      clickTimeout = window.setTimeout(function(){
+                          mouseEventCallback(d, dispatch.elementClick);
+                          clickTimeout = null;
+                      },300);
+                  }
               })
               .on('mouseover', function(d) {
                 mouseEventCallback(d, dispatch.elementMouseover);
