@@ -294,7 +294,7 @@ window.nv.tooltip.* also has various helper methods.
             }
         }
 
-          if(window.getComputedStyle(parentContainer).position === 'relative'){
+          if(parentContainer && window.getComputedStyle(parentContainer).position === 'relative'){
               pos[0] -= parentContainer.offsetLeft;
               pos[1] -= parentContainer.offsetTop;
           }
