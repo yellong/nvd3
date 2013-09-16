@@ -34,7 +34,8 @@ nv.models.pie = function() {
       var availableWidth = width - margin.left - margin.right,
           availableHeight = height - margin.top - margin.bottom,
           radius = Math.min(availableWidth, availableHeight) / 2,
-          arcRadius = radius-(radius / 5),
+          //arcRadius = radius-(radius / 5),
+          arcRadius = radius,
           container = d3.select(this);
 
 
