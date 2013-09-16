@@ -30,6 +30,7 @@ module.exports = function(grunt) {
                      'src/models/lineChart.js',
                      'src/models/linePlusBarChart.js',
                      'src/models/lineWithFocusChart.js',
+                     'src/models/lineWithFocusChart2.js',
                      'src/models/linePlusBarWithFocusChart.js',
                      'src/models/multiBar.js',
                      'src/models/multiBarChart.js',
@@ -39,6 +40,7 @@ module.exports = function(grunt) {
                      'src/models/ohlcBar.js',
                      'src/models/pie.js',
                      'src/models/pieChart.js',
+                     'src/models/radar.js',
                      'src/models/scatter.js',
                      'src/models/scatterChart.js',
                      'src/models/scatterPlusLineChart.js',
@@ -46,6 +48,7 @@ module.exports = function(grunt) {
                      'src/models/sparklinePlus.js',
                      'src/models/stackedArea.js',
                      'src/models/stackedAreaChart.js',
+                     'src/models/stackedAreaWithFocusChart.js',
                      'src/outro.js'
                      ],
                 dest: 'nv.d3.js'
