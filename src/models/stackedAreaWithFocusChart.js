@@ -144,6 +144,7 @@ nv.models.stackedAreaWithFocusChart = function () {
             var extent = option && option.extent;
             extent && brush.extent(extent);
             target.select('.nv-x.nv-brush').call(brush);
+            if(option===undefined || option===null)option = {}
             option.silent = option.silent || true;
             onBrush(option);
         };
