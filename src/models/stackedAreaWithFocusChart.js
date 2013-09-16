@@ -248,14 +248,12 @@ nv.models.stackedAreaWithFocusChart = function () {
     chart.x = function (_) {
         if (!arguments.length) return area.x;
         area.x(_);
-        column.x(_);
         return chart;
     };
 
     chart.y = function (_) {
         if (!arguments.length) return area.y;
         area.y(_);
-        column.y(_);
         return chart;
     };
 
