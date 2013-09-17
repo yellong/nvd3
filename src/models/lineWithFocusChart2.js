@@ -222,14 +222,12 @@ nv.models.lineWithFocusChart2 = function () {
     chart.x = function (_) {
         if (!arguments.length) return line.x;
         line.x(_);
-        column.x(_);
         return chart;
     };
 
     chart.y = function (_) {
         if (!arguments.length) return line.y;
         line.y(_);
-        column.y(_);
         return chart;
     };
 
