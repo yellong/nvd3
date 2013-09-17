@@ -26,7 +26,7 @@ nv.models.radarChart = function() {
         var left = e.pos[0] + ( (offsetElement && offsetElement.offsetLeft) || 0 ),
             top = e.pos[1] + ( (offsetElement && offsetElement.offsetTop) || 0),
             content = tooltip(e.label, e.rate);
-        nv.tooltip.show([left, top], content, 'n', null, offsetElement);
+        nv.tooltip.show([left, top], content, null, null, null);
     };
 
     var getMetrics = function(data){
@@ -310,7 +310,7 @@ nv.models.radarChart = function() {
 
                 seriesTooltip
                     .position({left: e.pos[0], top: e.pos[1]})
-                    .chartContainer(this.parentNode)
+//                    .chartContainer(null)
                     .enabled(tooltips)
                     .data(
                     {
