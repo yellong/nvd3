@@ -101,7 +101,12 @@ nv.models.lineWithFocusChart2 = function () {
                 + 'V' + (2 * y - 8);
         }
 
-        brush.x(xScale).on('brush', onBrush);
+        brush.x(xScale).on('brush', function(){
+            var oldTransition = chart.transitionDuration();
+            chart.transitionDuration(0);
+            onBrush.call(this,arguments);
+            chart.transitionDuration(oldTransition);
+        });
 
         if (brushExtent) brush.extent(brushExtent);
 
@@ -199,7 +204,7 @@ nv.models.lineWithFocusChart2 = function () {
                             }
                         })
                 );
-                d3.transition(focus).call(line);
+                focus.transition().duration(0).call(line);
             };
             dispatch.on("brush", onBrush);
             onBrush({extent: column.xScale().domain(), brush: brush});

@@ -221,7 +221,7 @@ nv.models.stackedAreaWithFocusChart = function () {
                             }
                         })
                 );
-                d3.transition(focus).call(area);
+                focus.transition().duration(0).call(area);
                 disableEvent();
 //                area.dispatch.on('tooltipShow', function (e) {
 //                    showTooltip(e, that.parentNode);
