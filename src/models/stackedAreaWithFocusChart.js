@@ -222,7 +222,7 @@ nv.models.stackedAreaWithFocusChart = function () {
                         })
                 );
                 focus.transition().duration(0).call(area);
-                disableEvent();
+                //disableEvent();
 //                area.dispatch.on('tooltipShow', function (e) {
 //                    showTooltip(e, that.parentNode);
 //                });
