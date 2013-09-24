@@ -10,6 +10,7 @@ nv.models.radarChart = function() {
         getX = function(d){ return d.label },
         getY = function(d){ return d.value },
         seriesTooltip = nv.models.tooltip(),
+        areaTooltip = seriesTooltip.contentGenerator(),
         tooltip = function(label,rate,point){
             var rateStr = 0;
             for(var k in rate){
@@ -259,11 +260,10 @@ nv.models.radarChart = function() {
 
                 seriesTooltip
                     .position({left: e.pos[0], top: e.pos[1]})
-//                    .chartContainer(null)
                     .enabled(tooltips)
                     .data(
                     {
-                        value: e.label ,
+                        value: e.label,
                         series: e.rate.map(function(d){
                             return {
                                 key:getX(d),
@@ -272,7 +272,12 @@ nv.models.radarChart = function() {
                             }
                         })
                     }
-                )();
+                );
+
+                seriesTooltip.contentGenerator(areaTooltip);
+
+                seriesTooltip();
+
                 dispatch.tooltipShow(e);
             })
             .on('mouseout',function(d,i){
@@ -445,6 +450,14 @@ nv.models.radarChart = function() {
         pointRadius = _;
         return chart;
     };
+
+    chart.areaTooltip = function(_){
+        if (!arguments.length) {
+            return areaTooltip;
+        }
+        areaTooltip = _;
+        return chart;
+    }
 
     return chart;
 }
