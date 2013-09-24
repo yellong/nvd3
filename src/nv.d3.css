@@ -780,9 +780,9 @@ radar Chart
     stroke-opacity: 0.5;
 }
 .nvd3 .nv-radar .radar-area path:hover {
-    stroke-width: 10;
-    stroke-opacity: 0.3;
+    stroke-width: 4;
     fill-opacity: 0.4;
+    stroke-opacity: 0.3;
 }
 .nvd3 .nv-radar .radar-area .radar-point {
     fill: #fff;

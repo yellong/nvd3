@@ -36,6 +36,13 @@ svg {
     <svg></svg>
   </div>
 
+  <div>
+      <button id="refresh" >刷新雷达图</button>
+      <input type="checkbox" id="sort"/>不对数据排序
+  </div>
+
+
+
 <script src="../lib/d3.v3.js"></script>
 <script src="../nv.d3.js"></script>
 <!-- including all the components so I don't have to minify every time I test in development -->
@@ -44,6 +51,17 @@ svg {
 <script src="../src/models/axis.js"></script>
 <script src="../src/models/radar.js"></script>
 <script>
+
+    var gData =  function(number){
+        var r =[],i=0;
+        for(;i<number;i++){
+            r.push({
+                'label': String.fromCharCode(65+i),
+                'value': Math.random()*(i+100)
+            });
+        }
+        return [{key:"default",values:r}];
+    }
 
 radarData = [
   {
@@ -84,9 +102,9 @@ radarData = [
     ]
   }
 ];
-
+var chart;
 nv.addGraph(function() {  
-  var chart = nv.models.radarChart()
+  chart = nv.models.radarChart()
       .x(function(d) { return d.label })
       .y(function(d) { return d.value })
       ;
@@ -99,6 +117,18 @@ nv.addGraph(function() {
 
   return chart;
 });
+
+    d3.select("#refresh").on('click',function(){
+        var new_data = gData(Math.floor(Math.random()*24));
+        d3.select('#chart1 svg')
+                .datum(new_data)
+                .call(chart);
+    });
+
+    d3.select("#sort").on('click',function(){
+        chart.sort(!this.checked);
+        chart.update();
+    })
 
 
 </script>
