@@ -14,12 +14,11 @@ nv.models.stackedAreaWithFocusChart = function () {
         , margin_area = {top: 30, right: 30, bottom: 20, left: 80}
         , margin_column = {top: 0, right: 30, bottom: 20, left: 80}
         , width = null
-        , height = null
         , height_area = null
         , height_column = 100
         , brushExtent = null;
 
-//    area.showControls(false);
+    area.showControls(true);
     area.useInteractiveGuideline(true);
     area.controls.key(function (d) {
         var mapping = {
@@ -28,7 +27,7 @@ nv.models.stackedAreaWithFocusChart = function () {
             "Expanded": "比例图"
         };
         return mapping[d.key];
-    });
+    }).rightAlign(false);
 
 
     column
@@ -192,7 +191,7 @@ nv.models.stackedAreaWithFocusChart = function () {
             var focusEnter = gEnter.append('g').attr('class', 'nv-focus');
 
             var contextEnter = gEnter.append('g').attr('class', 'nv-context');
-            contextEnter.attr('transform', 'translate( 0 ,' + ( availableHeight_area + margin_area.bottom + margin_column.top) + ')');
+            container.select('.nv-context').attr('transform', 'translate( 0 ,' + ( availableHeight_area + margin_area.bottom + margin_column.top) + ')');
 
             var context = container.select(".nv-context").datum(data_prepared.column).transition().duration(1200).call(column);
 
@@ -273,8 +272,8 @@ nv.models.stackedAreaWithFocusChart = function () {
     };
 
     chart.height = function (_) {
-        if (!arguments.length) return height;
-        height = _;
+        if (!arguments.length) return height_area ;
+        height_area = _ ;
         return chart;
     };
 

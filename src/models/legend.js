@@ -159,7 +159,7 @@ nv.models.legend = function() {
            g.attr('transform', 'translate(' + (width - margin.right - legendWidth) + ',' + margin.top + ')');
         }
         else {
-           g.attr('transform', 'translate(0' + ',' + margin.top + ')');
+           g.attr('transform', 'translate(15' + ',' + margin.top + ')');
         }
 
         height = margin.top + margin.bottom + (Math.ceil(seriesWidths.length / seriesPerRow) * 20);
