@@ -638,10 +638,12 @@ window.nv.tooltip.* also has various helper methods.
                 pos[1] += realContainer.offsetTop;
             }
         }
-
-          if(parentContainer && window.getComputedStyle(parentContainer).position === 'relative'){
-              pos[0] -= parentContainer.offsetLeft;
-              pos[1] -= parentContainer.offsetTop;
+          if(parentContainer){
+            var positionStyle =  window.getComputedStyle(parentContainer).position;
+            if(positionStyle === 'relative' ||  positionStyle === 'absolute'){
+                  pos[0] -= parentContainer.offsetLeft;
+                  pos[1] -= parentContainer.offsetTop;
+            }
           }
    
         container.style.left = 0;
@@ -9417,7 +9419,11 @@ nv.models.multiBarHorizontalChart = function() {
       });
 
       dispatch.on('tooltipShow', function(e) {
-        if (tooltips) showTooltip(e, that.parentNode);
+        if (tooltips){
+            e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+            showTooltip(e, that.parentNode);
+        }
+
       });
 
       // Update chart from a state object passed to event handler
