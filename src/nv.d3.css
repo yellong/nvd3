@@ -177,6 +177,10 @@ svg .title {
   shape-rendering: crispEdges;
 }
 
+.nv-brush .background{
+    pointer-events: all;
+}
+
 
 
 /**********
