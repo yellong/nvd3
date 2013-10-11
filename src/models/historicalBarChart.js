@@ -262,7 +262,10 @@ nv.models.historicalBarChart = function() {
       });
 
       dispatch.on('tooltipShow', function(e) {
-        if (tooltips) showTooltip(e, that.parentNode);
+          if (tooltips){
+              e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+              showTooltip(e, that.parentNode);
+          }
       });
 
 

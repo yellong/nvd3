@@ -151,15 +151,14 @@ nv.models.stackedAreaWithFocusChart = function () {
         return brush;
     };
 
-//    var showTooltip = function (e, offsetElement) {
-//        var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
-//            top = e.pos[1] + ( offsetElement.offsetTop || 0),
-//            x = area.xAxis.tickFormat()(area.x()(e.point, e.pointIndex)),
-//            y = area.yAxis.tickFormat()(area.y()(e.point, e.pointIndex)),
-//            content = area.tooltipContent()(e.series.key, x, y, e, chart);
-//
-//        nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null);
-//    };
+    var showTooltip = function (e, offsetElement) {
+        var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
+            top = e.pos[1] + ( offsetElement.offsetTop || 0),
+            x = area.xAxis.tickFormat()(area.x()(e.point, e.pointIndex)),
+            y = area.yAxis.tickFormat()(area.y()(e.point, e.pointIndex)),
+            content = area.tooltipContent()(e.series.key, x, y, e, chart);
+        nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null);
+    };
 
     var chart = function (selection) {
         selection.each(function (data) {
@@ -206,6 +205,15 @@ nv.models.stackedAreaWithFocusChart = function () {
 //                area.stacked.dispatch.on("areaClick.toggle", null);
             };
 
+            var bindTooltipShow = function(){
+                area.dispatch.on('tooltipShow', function(e) {
+                    if (tooltips){
+                        e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+                        showTooltip(e, that.parentNode);
+                    }
+                });
+            };
+
             var onBrush = function (brush_data) {
                 var extent = brush_data.extent;
                 var focus = d3.select(chart.container).select('g.nv-focus').datum(
@@ -222,9 +230,7 @@ nv.models.stackedAreaWithFocusChart = function () {
                 );
                 focus.transition().duration(0).call(area);
                 //disableEvent();
-//                area.dispatch.on('tooltipShow', function (e) {
-//                    showTooltip(e, that.parentNode);
-//                });
+                bindTooltipShow();
             };
             dispatch.on("brush", onBrush);
             onBrush({extent: column.xScale().domain(), brush: brush});
@@ -262,6 +268,10 @@ nv.models.stackedAreaWithFocusChart = function () {
         margin_area.right = typeof _.right != 'undefined' ? _.right : margin_area.right;
         margin_area.bottom = typeof _.bottom != 'undefined' ? _.bottom : margin_area.bottom;
         margin_area.left = typeof _.left != 'undefined' ? _.left : margin_area.left;
+        margin_column.top = typeof _.top != 'undefined' ? _.top : margin_column.top;
+        margin_column.right = typeof _.right != 'undefined' ? _.right : margin_column.right;
+        margin_column.bottom = typeof _.bottom != 'undefined' ? _.bottom : margin_column.bottom;
+        margin_column.left = typeof _.left != 'undefined' ? _.left : margin_column.left;
         return chart;
     };
 

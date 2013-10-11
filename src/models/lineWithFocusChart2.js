@@ -17,7 +17,8 @@ nv.models.lineWithFocusChart2 = function () {
         , height = null
         , height_area = null
         , height_column = 100
-        , brushExtent = null;
+        , brushExtent = null
+        , tooltips = true;
 
     column
         .tooltipContent(function () {
@@ -144,19 +145,20 @@ nv.models.lineWithFocusChart2 = function () {
         return brush;
     };
 
-//    var showTooltip = function (e, offsetElement) {
-//        var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
-//            top = e.pos[1] + ( offsetElement.offsetTop || 0),
-//            x = area.xAxis.tickFormat()(area.x()(e.point, e.pointIndex)),
-//            y = area.yAxis.tickFormat()(area.y()(e.point, e.pointIndex)),
-//            content = area.tooltipContent()(e.series.key, x, y, e, chart);
-//
-//        nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null);
-//    };
+    var showTooltip = function (e, offsetElement) {
+        var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
+            top = e.pos[1] + ( offsetElement.offsetTop || 0),
+            x = line.xAxis.tickFormat()(line.x()(e.point, e.pointIndex)),
+            y = line.yAxis.tickFormat()(line.y()(e.point, e.pointIndex)),
+            content = line.tooltipContent()(e.series.key, x, y, e, chart);
+
+        nv.tooltip.show([left, top], content, e.value < 0 ? 'n' : 's', null);
+    };
 
     var chart = function (selection) {
         selection.each(function (data) {
             var container = d3.select(this);
+            var that =  this;
 
             var availableWidth = (width || parseInt(container.style('width')) || 960),
                 availableHeight_area = (height_area || parseInt(container.style('height')) || 400) - margin_area.top - margin_area.bottom - height_column,
@@ -190,6 +192,16 @@ nv.models.lineWithFocusChart2 = function () {
 
             appendBrush(column, {height: availableHeight_column});
 
+            var bindTooltipShow = function(){
+                line.dispatch.on('tooltipShow', function(e) {
+                    if (tooltips){
+                        e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+                        console.log(e.pos);
+                        showTooltip(e, that.parentNode);
+                    }
+                });
+            }
+
             var onBrush = function (brush_data) {
                 var extent = brush_data.extent;
                 var focus = d3.select(chart.container).select('g.nv-focus').datum(
@@ -205,8 +217,10 @@ nv.models.lineWithFocusChart2 = function () {
                         })
                 );
                 focus.transition().duration(0).call(line);
+                bindTooltipShow();
             };
             dispatch.on("brush", onBrush);
+
             onBrush({extent: column.xScale().domain(), brush: brush});
         });
         return chart;
@@ -223,6 +237,12 @@ nv.models.lineWithFocusChart2 = function () {
     chart.yAxis2 = column.yAxis;
     chart.tooltipContent = line.tooltipContent;
     chart.brush = brush;
+
+    chart.tooltips =  function(_){
+        if (!arguments.length) return tooltips;
+        tooltips = _;
+        return chart;
+    }
 
     chart.x = function (_) {
         if (!arguments.length) return line.x;
@@ -242,6 +262,10 @@ nv.models.lineWithFocusChart2 = function () {
         margin_area.right = typeof _.right != 'undefined' ? _.right : margin_area.right;
         margin_area.bottom = typeof _.bottom != 'undefined' ? _.bottom : margin_area.bottom;
         margin_area.left = typeof _.left != 'undefined' ? _.left : margin_area.left;
+        margin_column.top = typeof _.top != 'undefined' ? _.top : margin_column.top;
+        margin_column.right = typeof _.right != 'undefined' ? _.right : margin_column.right;
+        margin_column.bottom = typeof _.bottom != 'undefined' ? _.bottom : margin_column.bottom;
+        margin_column.left = typeof _.left != 'undefined' ? _.left : margin_column.left;
         return chart;
     };
 
