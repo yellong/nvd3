@@ -293,9 +293,12 @@ window.nv.tooltip.* also has various helper methods.
                 pos[1] += realContainer.offsetTop;
             }
         }
+
+        var relative = false;
           if(parentContainer){
             var positionStyle =  window.getComputedStyle(parentContainer).position;
             if(positionStyle === 'relative' ||  positionStyle === 'absolute'){
+                  relative = true;
                   pos[0] -= parentContainer.offsetLeft;
                   pos[1] -= parentContainer.offsetTop;
             }
@@ -312,7 +315,7 @@ window.nv.tooltip.* also has various helper methods.
            pos[0] = pos[0] - parentContainer.scrollLeft;
            pos[1] = pos[1] - parentContainer.scrollTop;
         }
-        nv.tooltip.calcTooltipPosition(pos, gravity, dist, container);
+        nv.tooltip.calcTooltipPosition(pos, gravity, dist, container ,relative);
   };
 
   //Looks up the ancestry of a DOM element, and returns the first NON-svg node.
@@ -354,7 +357,7 @@ window.nv.tooltip.* also has various helper methods.
   //gravity = how to orient the tooltip
   //dist = how far away from the mouse to place tooltip
   //container = tooltip DIV
-  nv.tooltip.calcTooltipPosition = function(pos, gravity, dist, container) {
+  nv.tooltip.calcTooltipPosition = function(pos, gravity, dist, container ,relative) {
 
             var height = parseInt(container.offsetHeight),
                 width = parseInt(container.offsetWidth),
@@ -394,7 +397,9 @@ window.nv.tooltip.* also has various helper methods.
                 var tLeft = tooltipLeft(container);
                 var tTop = tooltipTop(container);
                 if (tLeft + width > windowWidth) left = pos[0] - width - dist;
-                if (tTop < scrollTop) top = scrollTop + 5;
+                if (tTop < scrollTop){
+                        top = relative ? top+scrollTop-tTop+10 : scrollTop;
+                }
                 if (tTop + height > scrollTop + windowHeight) top = scrollTop + windowHeight - tTop + top - height;
                 break;
               case 'n':
@@ -402,7 +407,9 @@ window.nv.tooltip.* also has various helper methods.
                 top = pos[1] + dist;
                 var tLeft = tooltipLeft(container);
                 var tTop = tooltipTop(container);
-                if (tLeft < scrollLeft) left = scrollLeft + 5;
+                if (tLeft < scrollLeft) {
+                    left = relative ? left + scrollLeft- tLeft + 10 : scrollLeft + 5;
+                }
                 if (tLeft + width > windowWidth) left = left - width/2 + 5;
                 if (tTop + height > scrollTop + windowHeight) top = scrollTop + windowHeight - tTop + top - height;
                 break;
@@ -411,9 +418,13 @@ window.nv.tooltip.* also has various helper methods.
                 top = pos[1] - height - dist;
                 var tLeft = tooltipLeft(container);
                 var tTop = tooltipTop(container);
-                if (tLeft < scrollLeft) left = scrollLeft + 5;
+                if (tLeft < scrollLeft) {
+                    left = relative ? left + scrollLeft- tLeft + 10 : scrollLeft + 5;
+                }
                 if (tLeft + width > windowWidth) left = left - width/2 + 5;
-                if (scrollTop > tTop) top = scrollTop;
+                if (scrollTop > tTop) {
+                    top = relative ? top+scrollTop-tTop+10 : scrollTop;
+                }
                 break;
               case 'none':
                 left = pos[0];
