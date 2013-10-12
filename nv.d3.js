@@ -12363,8 +12363,8 @@ nv.models.scatterChart = function() {
     var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
         top = e.pos[1] + ( offsetElement.offsetTop || 0),
         leftX = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
-        topX = y.range()[0] + margin.top + ( offsetElement.offsetTop || 0),
-        leftY = x.range()[0] + margin.left + ( offsetElement.offsetLeft || 0 ),
+        topX = y.range()[0] + margin.top + (e.pos[3] || 0) + ( offsetElement.offsetTop || 0),
+        leftY = x.range()[0] + margin.left + (e.pos[2] || 0) + ( offsetElement.offsetLeft || 0 ),
         topY = e.pos[1] + ( offsetElement.offsetTop || 0),
         xVal = xAxis.tickFormat()(scatter.x()(e.point, e.pointIndex)),
         yVal = yAxis.tickFormat()(scatter.y()(e.point, e.pointIndex));
@@ -12701,7 +12701,7 @@ nv.models.scatterChart = function() {
 
       dispatch.on('tooltipShow', function(e) {
             if (tooltips){
-                e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+                e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0) , that.offsetLeft , that.offsetTop];
                 showTooltip(e, that.parentNode);
             }
       });
