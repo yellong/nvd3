@@ -75,6 +75,16 @@ nv.addGraph(function() {
       .groupSpacing(0.1)
       ;
 
+    chart.controls.key(function(d){
+        var mapping ={
+            "Stacked":"堆积图",
+            "Grouped":"分组图"
+        }
+        return mapping[d.key];
+    });
+
+    chart.controls.rightAlign(false);
+
     chart.multibar
       .hideable(true);
 
