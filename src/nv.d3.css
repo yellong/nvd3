@@ -803,3 +803,17 @@ radar Chart
     fill: #333;
     stroke: none;
 }
+
+
+/****
+matrix Chart
+*/
+
+.nvd3 .nv-cell{
+    cursor: pointer;
+    fill-opacity: .8;
+}
+
+.nvd3 .nv-cell.hover{
+    fill-opacity: 1;
+}
