@@ -810,10 +810,26 @@ matrix Chart
 */
 
 .nvd3 .nv-cell{
+    fill:#ddd;
     cursor: pointer;
     fill-opacity: .8;
 }
+.nvd3 .nv-legendCell{
+    fill:#ddd;
+}
+.nvd3 .nv-cellsWrap{
 
+}
+.nvd3 .nv-cellsWrap text{
+    fill:#000;
+    pointer-events:none;
+}
 .nvd3 .nv-cell.hover{
     fill-opacity: 1;
+}
+
+.nvd3 .nv-cell.selected{
+    fill-opacity: 1;
+    stroke:#888;
+    stroke-width:3;
 }

@@ -15,9 +15,11 @@ nv.models.matrix = function() {
         cellWidth = 28,
         cellRound = 2,
 
+        colors = colorbrewer.Blues[6],
+
         x = function(d,i){return (i%xCellCount) * (cellWidth+cellPaddding)},
         y = function(d,i){return Math.floor( i/xCellCount ) * (cellWidth+cellPaddding) },
-        color = d3.scale.ordinal().range(colorbrewer.YlGn[6]),
+        color = d3.scale.ordinal().range(colors),
 
         getKey = function(d,i) { return d.key } ,
         getColor = function(d,i) { return d.color } ,
@@ -29,10 +31,11 @@ nv.models.matrix = function() {
             return "<h3>"+key+"</h3><p>"+color+"</p>";
         },
 
-        legend = nv.models.legend(),
-
-        showLabel = false,
+        showLabel = true,
+        showLegend = true,
         disabledColor = '#ccc',
+
+        noData = 'no data',
 
         dispatch = d3.dispatch('tooltipShow','tooltipHide','elementMouseover','elementMouseout','elementClick','stateChange', 'changeState');
 
@@ -69,32 +72,67 @@ nv.models.matrix = function() {
                 availableWidth = (width||parseInt(container.style('width'))||900)  - margin.left - margin.right,
                 availableHeight = (height||parseInt(container.style('height'))||500) - margin.top - margin.bottom;
 
+            chart.update = function() { container.transition().duration(transitionDuration).call(chart); };
+            chart.container = this;
+
+            container.style('width',availableWidth).style('height',availableHeight);
+
             xCellCount = Math.floor( availableWidth / (cellWidth+cellPaddding) );
+
+            //------------------------------------------------------------
+            // No data
+            if (!data || !data.length || !data.filter(function(d) { return d.values.length }).length) {
+                var noDataText = container.selectAll('.nv-noData').data([noData]);
+
+                noDataText.enter().append('text')
+                    .attr('class', 'nvd3 nv-noData')
+                    .attr('dy', '-.7em')
+                    .style('text-anchor', 'middle');
+
+                noDataText
+                    .attr('x', margin.left + availableWidth / 2)
+                    .attr('y', margin.top + availableHeight / 2)
+                    .text(function(d) { return d });
+
+                return chart;
+            } else {
+                container.selectAll('.nv-noData').remove();
+            }
+
             cellCount = data[0].values.length;
-
-            //------------------------------------------------------------
-            // Setup Scales
-
-
-            //------------------------------------------------------------
-
 
             //------------------------------------------------------------
             // Setup containers and skeleton of chart
 
             var prepared_data = prepareData(data);
-
             var wrap = container.selectAll('g.nv-wrap.nv-matrix').data([prepared_data]);
             var wrapEnter = wrap.enter().append('g').attr('class', 'nvd3 nv-wrap nv-matrix');
             var gEnter = wrapEnter.append('g').data(function(d){return d});
             var g = wrap.select('g');
 
+            gEnter.append('rect').attr('class', 'nvd3 nv-background');
+            gEnter.append('g').attr('class','nv-cellsWrap');
+            gEnter.append('g').attr('class', 'nv-legendWrap');
+            gEnter.append('defs');
+
             wrap.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-            var cells =  gEnter.selectAll('rect.nv-cell').data(function(d){return d})
+            var clipScale = 0.75;
+            var clipPathWrap = wrap.select('defs');
+            var clipPath = clipPathWrap.selectAll('clipPath').data(function(d){return d});
+            clipPath.enter().append('clipPath').attr('id',function(d,i){return 'm-clipPath-'+i}).append('rect').data(function(d){return d});
+            clipPath.exit().remove();
+            clipPath.selectAll('rect')
+                .attr('x',function(d){return  d.x + (1-clipScale)/2*cellWidth;})
+                .attr('y',function(d){return  d.y + (1-clipScale)/2*cellWidth;})
+                .attr('rx',cellRound).attr('ry',cellRound)
+                .attr('width',cellWidth*clipScale).attr('height',cellWidth*clipScale);
+
+            var cellsWrap = wrap.select('.nv-cellsWrap');
+            var cells = cellsWrap.selectAll('rect.nv-cell').data(function(d){return d})
             cells.enter().append('rect').attr('class','nv-cell');
             cells.exit().remove();
-            cells.transition( transitionDuration )
+            cells.transition().duration( transitionDuration )
                 .attr('x',function(d){return  d.x;})
                 .attr('y',function(d){return  d.y;})
                 .attr('rx',cellRound).attr('ry',cellRound)
@@ -105,6 +143,8 @@ nv.models.matrix = function() {
                     if (!data[d.series]) return 0;
                     var series = data[d.series],
                         point  = series.values[i];
+                    var target  =  d3.select(d3.event.target);
+                    target.classed('selected',!target.classed('selected'));
                     dispatch.elementClick({
                         point: point,
                         series: series,
@@ -142,14 +182,41 @@ nv.models.matrix = function() {
                 })
 
             if(showLabel){
-                gEnter.selectAll('text').data(function(d){return d}).enter().append('text')
-                    .text(function(d){return d.key})
-                    .attr('x',function(d){return  d.x+cellWidth/2;})
-                    .attr('y',function(d){return  d.y+cellWidth/2;})
+                var cellTexts = cellsWrap.selectAll('text').data(function(d){return d});
+                    cellTexts.enter().append('text');
+                    cellTexts.exit().remove();
+                    cellTexts.transition().duration(transitionDuration)
+                        .text(function(d){return d.key})
+                        .style('clip-path',function(d,i){return 'url(#m-clipPath-'+i+')';})
+                        .style('width',cellWidth * .8).style('font-size', function(d){return cellWidth / d.key.length})
+                        .attr('x',function(d){return  d.x+cellWidth/5})
+                        .attr('y',function(d){return  d.y+cellWidth/2+4});
+            }
+
+            if (showLegend) {
+                var legendScale = 2;
+                var legendData = colors.map(function(c,i){
+                    return {color:c,x:(cellWidth+cellPaddding)/legendScale*i,y:0}
+                });
+                var legendWrap =  wrap.select('.nv-legendWrap');
+                var legend =  legendWrap.selectAll('rect').data(legendData);
+                legend.enter().append('rect').attr('class','nv-legendCell');
+                legend.exit().remove();
+                legend.transition().duration(transitionDuration)
+                    .attr('x',function(d){return  d.x;})
+                    .attr('y',function(d){return  d.y;})
+                    .attr('rx',cellRound/legendScale).attr('ry',cellRound/legendScale)
+                    .attr('width',cellWidth/legendScale).attr('height',cellWidth/legendScale)
+                    .style('fill',function(d){return d.color});
+                legendWrap.attr('transform', 'translate(' + (availableWidth-margin.left-(cellWidth+cellPaddding)/legendScale*legendData.length) + ',' + (Math.ceil(cellCount/xCellCount)*(cellWidth+cellPaddding)+10) +')');
             }
 
             dispatch.on('elementMouseover.tooltip',function(e){
                 dispatch.tooltipShow(e);
+            });
+
+            dispatch.on('elementClick.in',function(e){
+
             });
 
             dispatch.on('elementMouseout.tooltip',function(e){
@@ -230,9 +297,39 @@ nv.models.matrix = function() {
         return chart;
     };
 
+    chart.cellPaddding = function(_) {
+        if (!arguments.length) return cellPaddding;
+        cellPaddding = _;
+        return chart;
+    };
+
+    chart.cellWidth = function(_) {
+        if (!arguments.length) return cellWidth;
+        cellWidth = _;
+        return chart;
+    };
+
+    chart.cellRound = function(_) {
+        if (!arguments.length) return cellRound;
+        cellRound = _;
+        return chart;
+    };
+
+    chart.disabled = function(_) {
+        if (!arguments.length) return disabled;
+        disabled = _;
+        return chart;
+    };
+
+    chart.disableColor= function(_) {
+        if (!arguments.length) return disabledColor;
+        disabledColor = _;
+        return chart;
+    };
+
     chart.color = function(_) {
-        if (!arguments.length) return color;
-        color = nv.utils.getColor(_)
+        if (!arguments.length) return colors;
+        color = d3.scale.ordinal().range(colors = _);
         return chart;
     };
 

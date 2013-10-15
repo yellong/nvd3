@@ -72,6 +72,7 @@ nv.addGraph(function() {
 //  });
 
     var dd = randomData(40);
+//    dd = null;
     console.log(dd);
     d3.select('#test1 svg')
       .datum(dd)
@@ -87,8 +88,8 @@ function randomData(points) { //# groups,# points per group
 
     for (j = 0; j < points; j++) {
       data.push({
-        key: "PH-"+Math.floor(Math.random()*1000000000000),
-        color: parseInt(Math.random()*200)>88 ? parseInt(Math.random()*200) : 0
+        key: String.fromCharCode(Math.floor(65+Math.random()*25),Math.floor(97+Math.random()*25)),
+        color: parseInt(Math.random()*200)>20 ? parseInt(Math.random()*200) : 0
       });
     }
 
