@@ -64,7 +64,7 @@ nv.addGraph(function() {
   chart = nv.models.matrix()
           .getKey(function(d){return d.key})
           .getColor(function(d){return d.color})
-          .width(500)
+          .width(500).showLabels(true)
           .transitionDuration(300);
 //
 //  chart.tooltipContent(function(key) {

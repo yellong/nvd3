@@ -31,7 +31,7 @@ nv.models.matrix = function() {
             return "<h3>"+key+"</h3><p>"+color+"</p>";
         },
 
-        showLabel = true,
+        showLabels = false,
         showLegend = true,
         disabledColor = '#ccc',
 
@@ -75,7 +75,6 @@ nv.models.matrix = function() {
             chart.update = function() { container.transition().duration(transitionDuration).call(chart); };
             chart.container = this;
 
-            container.style('width',availableWidth).style('height',availableHeight);
 
             xCellCount = Math.floor( availableWidth / (cellWidth+cellPaddding) );
 
@@ -100,6 +99,9 @@ nv.models.matrix = function() {
             }
 
             cellCount = data[0].values.length;
+
+            availableWidth = xCellCount * (cellWidth+cellPaddding)  + margin.left + margin.right;
+            availableHeight = Math.ceil(cellCount/xCellCount) * (cellWidth+cellPaddding) + margin.top +margin.bottom;
 
             //------------------------------------------------------------
             // Setup containers and skeleton of chart
@@ -181,16 +183,20 @@ nv.models.matrix = function() {
                     });
                 })
 
-            if(showLabel){
+            if(showLabels){
+                var magicFontSize = 7;
                 var cellTexts = cellsWrap.selectAll('text').data(function(d){return d});
                     cellTexts.enter().append('text');
                     cellTexts.exit().remove();
                     cellTexts.transition().duration(transitionDuration)
                         .text(function(d){return d.key})
                         .style('clip-path',function(d,i){return 'url(#m-clipPath-'+i+')';})
-                        .style('width',cellWidth * .8).style('font-size', function(d){return cellWidth / d.key.length})
-                        .attr('x',function(d){return  d.x+cellWidth/5})
-                        .attr('y',function(d){return  d.y+cellWidth/2+4});
+                        .style('textLength',cellWidth * .8)
+                        .attr('x',function(d){return  d.x+(cellWidth-magicFontSize* d.key.length)/2;})
+                        .attr('y',function(d){return  d.y+cellWidth/2+4})
+                        .style('fill',function(d,i){
+                            return colors.indexOf( color(d.color) )/colors.length > 0.618 ? '#fff':'#000'
+                        })
             }
 
             if (showLegend) {
@@ -208,8 +214,11 @@ nv.models.matrix = function() {
                     .attr('rx',cellRound/legendScale).attr('ry',cellRound/legendScale)
                     .attr('width',cellWidth/legendScale).attr('height',cellWidth/legendScale)
                     .style('fill',function(d){return d.color});
-                legendWrap.attr('transform', 'translate(' + (availableWidth-margin.left-(cellWidth+cellPaddding)/legendScale*legendData.length) + ',' + (Math.ceil(cellCount/xCellCount)*(cellWidth+cellPaddding)+10) +')');
+                legendWrap.attr('transform', 'translate(' + ((cellWidth+cellPaddding)*(xCellCount-legendData.length/legendScale)-cellPaddding/legendScale) + ',' + (Math.ceil(cellCount/xCellCount)*(cellWidth+cellPaddding)+10) +')');
             }
+
+
+            container.style('width',availableWidth).style('height',availableHeight+cellWidth/legendScale+10);
 
             dispatch.on('elementMouseover.tooltip',function(e){
                 dispatch.tooltipShow(e);
@@ -224,6 +233,7 @@ nv.models.matrix = function() {
             });
 
             dispatch.on('tooltipShow',function(e){
+                e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0) , that.offsetLeft , that.offsetTop];
                 showTooltip(e,that.parentNode);
             });
 
@@ -240,13 +250,9 @@ nv.models.matrix = function() {
         return chart;
     }
 
-
-
-
     //============================================================
     // Expose Public Variables
     //------------------------------------------------------------
-
 
     chart.dispatch = dispatch;
 
@@ -267,6 +273,12 @@ nv.models.matrix = function() {
     chart.getColor = function(_){
         if (!arguments.length) return getColor;
         getColor = _;
+        return chart;
+    }
+
+    chart.noData = function(_){
+        if (!arguments.length) return noData;
+        noData = _;
         return chart;
     }
 
@@ -327,9 +339,9 @@ nv.models.matrix = function() {
         return chart;
     };
 
-    chart.color = function(_) {
-        if (!arguments.length) return colors;
-        color = d3.scale.ordinal().range(colors = _);
+    chart.showLabels = function(_) {
+        if (!arguments.length) return showLabels;
+        showLabels = _;
         return chart;
     };
 
