@@ -827,9 +827,3 @@ matrix Chart
 .nvd3 .nv-cell.hover{
     fill-opacity: 1;
 }
-
-.nvd3 .nv-cell.selected{
-    fill-opacity: 1;
-    stroke:#888;
-    stroke-width:3;
-}
