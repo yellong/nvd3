@@ -19,7 +19,8 @@ nv.models.matrix = function() {
 
         x = function(d,i){return (i%xCellCount) * (cellWidth+cellPaddding)},
         y = function(d,i){return Math.floor( i/xCellCount ) * (cellWidth+cellPaddding) },
-        color = d3.scale.ordinal().range(colors),
+        color = d3.scale.quantize().range(colors),
+        
 
         getKey = function(d,i) { return d.key } ,
         getColor = function(d,i) { return d.color } ,
@@ -40,7 +41,7 @@ nv.models.matrix = function() {
         dispatch = d3.dispatch('tooltipShow','tooltipHide','elementMouseover','elementMouseout','elementClick','stateChange', 'changeState');
 
     var prepareData = function(data){
-        return d3.merge(
+        var p_data = d3.merge(
             data.map(function(d,s) {
                 return d.values.map(function(d,i) {
                     return {
@@ -53,6 +54,8 @@ nv.models.matrix = function() {
                 })
             })
         );
+        color.domain(d3.extent(p_data,function(d){return d.color}));
+        return p_data;
     }
 
     var showTooltip = function(e, offsetElement){
