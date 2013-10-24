@@ -14,6 +14,7 @@ module.exports = function(grunt) {
                      'src/interactiveLayer.js',
                      'src/tooltip.js',
                      'src/utils.js',
+                     'src/colorbrewer.js',
                      'src/models/axis.js',
                      'src/models/historicalBar.js',
                      'src/models/bullet.js',
@@ -37,6 +38,7 @@ module.exports = function(grunt) {
                      'src/models/multiBarHorizontal.js',
                      'src/models/multiBarHorizontalChart.js',
                      'src/models/multiChart.js',
+                     'src/models/matrix.js',
                      'src/models/ohlcBar.js',
                      'src/models/pie.js',
                      'src/models/pieChart.js',
@@ -75,17 +77,25 @@ module.exports = function(grunt) {
         },
         watch: {
             js: {
-                files: ["src/**/*.js"],
-                tasks: ['concat']
+                files: ["src/**/*.js","src/nv.d3.css"],
+                tasks: ['concat','copy']
             }
         },
-
+        copy: {
+                main: {
+                    src:['nv.d3.js','src/nv.d3.css'],
+                    dest:'../exploder/public/libs/nvd3/',
+                    flatten: true,
+                    expand: true
+                }
+            }
     });
 
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('default', ['concat']);
     grunt.registerTask('production', ['concat', 'uglify']);
