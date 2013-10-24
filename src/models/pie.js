@@ -12,6 +12,7 @@ nv.models.pie = function() {
     , getDescription = function(d) { return d.description }
     , id = Math.floor(Math.random() * 10000) //Create semi-unique ID in case user doesn't select one
     , color = nv.utils.defaultColor()
+    , labelFormat = function( d ) { return d; }
     , valueFormat = d3.format(',.2f')
     , showLabels = true
     , pieLabelsOutside = true
@@ -214,7 +215,7 @@ nv.models.pie = function() {
                 .text(function(d, i) {
                   var percent = (d.endAngle - d.startAngle) / (2 * Math.PI);
                   var labelTypes = {
-                    "key" : getX(d.data),
+                    "key" : labelFormat(getX(d.data)),
                     "value": getY(d.data),
                     "percent": d3.format('%')(percent)
                   };
@@ -379,6 +380,12 @@ nv.models.pie = function() {
     if (!arguments.length) return color;
     color = nv.utils.getColor(_);
     return chart;
+  };
+
+  chart.labelFormat = function(_) {
+     if (!arguments.length) return labelFormat;
+     labelFormat = _;
+     return chart;
   };
 
   chart.valueFormat = function(_) {
