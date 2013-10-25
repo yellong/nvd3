@@ -10720,6 +10720,12 @@ nv.models.matrix = function() {
         return chart;
     };
 
+    chart.colors = function(_) {
+        if (!arguments.length) return colors;
+        colors = _;
+        return chart;
+    };
+
     //============================================================
 
 
