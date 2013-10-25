@@ -15,7 +15,7 @@ nv.models.matrix = function() {
         cellWidth = 28,
         cellRound = 2,
 
-        colors = colorbrewer.Blues[6],
+        colors = colorbrewer.Greens[6],
 
         x = function(d,i){return (i%xCellCount) * (cellWidth+cellPaddding)},
         y = function(d,i){return Math.floor( i/xCellCount ) * (cellWidth+cellPaddding) },
@@ -31,6 +31,9 @@ nv.models.matrix = function() {
         tooltipContent = function(skey,key,color,e,chart){
             return "<h3>"+key+"</h3><p>"+color+"</p>";
         },
+
+        labelContent = null,
+        labelFormat = function(d){return d;},
 
         showLabels = false,
         showLegend = true,
@@ -192,11 +195,16 @@ nv.models.matrix = function() {
                     cellTexts.enter().append('text');
                     cellTexts.exit().remove();
                     cellTexts.transition().duration(transitionDuration)
-                        .text(function(d){return d.key})
+                        .text(labelContent || function( d, i ){
+                            return labelFormat( d.key );
+                        })
+                        .style('text-anchor','middle')
+                        //todo: fix clip-path position
                         .style('clip-path',function(d,i){return 'url(#m-clipPath-'+i+')';})
                         .style('textLength',cellWidth * .8)
-                        .attr('x',function(d){return  d.x+(cellWidth-magicFontSize* d.key.length)/2;})
-                        .attr('y',function(d){return  d.y+cellWidth/2+4})
+                        .attr('x',function(d){return d.x+cellWidth/2;})
+                        .attr('y',function(d){return d.y+cellWidth/2;})
+                        .attr('dy', '.32em')
                         .style('fill',function(d,i){
                             return colors.indexOf( color(d.color) )/colors.length > 0.618 ? '#fff':'#000'
                         })
@@ -264,6 +272,18 @@ nv.models.matrix = function() {
     chart.tooltipContent = function(_){
         if (!arguments.length) return tooltipContent;
         tooltipContent = _;
+        return chart;
+    }
+
+    chart.labelFormat = function(_){
+        if (!arguments.length) return labelFormat;
+        labelFormat = _;
+        return chart;
+    }
+
+    chart.labelContent = function(_){
+        if (!arguments.length) return labelContent;
+        labelContent = _;
         return chart;
     }
 
@@ -351,6 +371,7 @@ nv.models.matrix = function() {
     chart.colors = function(_) {
         if (!arguments.length) return colors;
         colors = _;
+        color = d3.scale.quantize().range(colors);
         return chart;
     };
 
