@@ -10499,10 +10499,12 @@ nv.models.matrix = function() {
 
             var clipScale = 0.75;
             var clipPathWrap = wrap.select('defs');
-            var clipPath = clipPathWrap.selectAll('clipPath').data(function(d){return d});
-            clipPath.enter().append('clipPath').attr('id',function(d,i){return 'm-clipPath-'+i}).append('rect').data(function(d){return d});
+            var clipPath = clipPathWrap.selectAll('.nv-clipPath-mask').data(function(d){return d});
+            clipPath.enter().append('clipPath').attr('id',function(d,i){return 'm-clipPath-'+i}).attr('class','.nv-clipPath-mask').append('rect');
             clipPath.exit().remove();
-            clipPath.selectAll('rect')
+
+            //todo: make this [d] easy to understand
+            clipPath.selectAll('rect').data(function(d){return [d];})
                 .attr('x',function(d){return  d.x + (1-clipScale)/2*cellWidth;})
                 .attr('y',function(d){return  d.y + (1-clipScale)/2*cellWidth;})
                 .attr('rx',cellRound).attr('ry',cellRound)
