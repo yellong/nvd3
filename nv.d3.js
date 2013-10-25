@@ -10500,7 +10500,7 @@ nv.models.matrix = function() {
             var clipScale = 0.75;
             var clipPathWrap = wrap.select('defs');
             var clipPath = clipPathWrap.selectAll('.nv-clipPath-mask').data(function(d){return d});
-            clipPath.enter().append('clipPath').attr('id',function(d,i){return 'm-clipPath-'+i}).attr('class','.nv-clipPath-mask').append('rect');
+            clipPath.enter().append('clipPath').attr('id',function(d,i){return 'm-clipPath-'+i}).attr('class','nv-clipPath-mask').append('rect');
             clipPath.exit().remove();
 
             //todo: make this [d] easy to understand
