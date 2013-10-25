@@ -10601,7 +10601,7 @@ nv.models.matrix = function() {
             }
 
 
-            container.style('width',availableWidth).style('height',availableHeight+cellWidth/legendScale+10);
+            container.style('width',availableWidth + 'px').style('height',availableHeight+cellWidth/legendScale+10 + 'px');
 
             dispatch.on('elementMouseover.tooltip',function(e){
                 dispatch.tooltipShow(e);
