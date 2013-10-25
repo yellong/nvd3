@@ -172,7 +172,7 @@ nv.models.historicalBar = function() {
           .transition()
           .attr('transform', function(d,i) { return 'translate(' + (x(getX(d,i)) - availableWidth / data[0].values.length * .45) + ',0)'; }) 
            //TODO: better width calculations that don't assume always uniform data spacing;w
-          .attr('width', (availableWidth / data[0].values.length) * .9 );
+          .attr('width', (availableWidth / data[0].values.length) * .8 );
 
 
       bars.transition()
