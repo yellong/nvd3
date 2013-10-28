@@ -77,7 +77,6 @@ nv.models.historicalBarWithFocusChart = function() {
 
   //============================================================
 
-
   function chart(selection) {
     selection.each(function(data) {
       var container = d3.select(this),
@@ -323,7 +322,6 @@ nv.models.historicalBarWithFocusChart = function() {
                         .attr('width', rightWidth < 0 ? 0 : rightWidth);
                 });
         }
-
 
         function onBrush() {
             brushExtent = brush.empty() ? null : brush.extent();

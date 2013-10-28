@@ -25,6 +25,7 @@ module.exports = function(grunt) {
                      'src/models/distribution.js',
                      'src/models/historicalBar.js',
                      'src/models/historicalBarChart.js',
+                     'src/models/historicalBarWithFocusChart.js',
                      'src/models/indentedTree.js',
                      'src/models/legend.js',
                      'src/models/line.js',
