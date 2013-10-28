@@ -363,8 +363,29 @@ nv.models.scatter = function() {
           .style('stroke-opacity', 1)
           .style('fill-opacity', .5);
 
+      var pointLabels = groups.selectAll('text.nv-point-label').data(function(d){return d.values},pointKey);
+        pointLabels.enter().append('text')
+            .attr('class',function(d,i){return "nv-point-label nv-point-label"+i})
+            .style('stroke','rgba(0,0,0,0)').style('fill','#000')
+            .style('font-family',' "Helvetica Neue", Helvetica, "Microsoft YaHei", Arial, sans-serif')
+            .style('fill-opacity','1.0')
+            .attr('text-anchor','middle')
+            .text(function(d){
+                return Math.sqrt(z(getSize(d,i))/Math.PI)>20? d.label:"";
+            })
+            .attr('dy','.32em')
+            .attr('x', function(d,i) { return nv.utils.NaNtoZero(x(getX(d,i))) })
+            .attr('y', function(d,i) { return nv.utils.NaNtoZero(y(getY(d,i))) });
 
-      if (onlyCircles) {
+        pointLabels.exit().remove();
+        pointLabels.transition()
+            .text(function(d){
+                return Math.sqrt(z(getSize(d,i))/Math.PI)>20? d.label:"";
+            })
+            .attr('x', function(d,i) { return nv.utils.NaNtoZero(x(getX(d,i))) })
+            .attr('y', function(d,i) { return nv.utils.NaNtoZero(y(getY(d,i))) }) ;
+
+        if (onlyCircles) {
 
         var points = groups.selectAll('circle.nv-point')
             .data(function(d) { return d.values }, pointKey);
