@@ -395,16 +395,15 @@ nv.models.historicalBarWithFocusChart = function() {
             var step = x.domain()[1]/data[0].values.length;
             var end  = x.domain()[1];
 
-            if( brush.empty() ){
+            if( brush.empty() || brushExtent === null){
                 brushExtent = [ x.domain()[0], x.domain()[0]+(playMode?step:2*step) ];
             }
-
             if( brushExtent[1] >= end ){
                 brushExtent = playMode?[ brushExtent[0], brushExtent[0] ]:[ x.domain()[0], x.domain()[0] + brushExtent[1]- brushExtent[0] ];
             }
 
             var playstep = function(){
-                if(brushExtent[1] === end){
+                if( brushExtent === null || brushExtent[1] === end ){
                     clearTimeout(chart.playTimer);
                     chart.playTimer = null;
                     setTimeout(function(){
@@ -412,7 +411,7 @@ nv.models.historicalBarWithFocusChart = function() {
                     },0);
                     return;
                 }
-                if(brushExtent[1]+ step >= end){
+                if(brushExtent[1] + step >= end){
                    step = end - brushExtent[1];
                 }
                 brushExtent = [ playMode?brushExtent[0]:brushExtent[0]+=step , brushExtent[1]+=step ];
