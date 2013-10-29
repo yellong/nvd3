@@ -38,6 +38,7 @@ nv.models.scatter = function() {
     , singlePoint  = false
     , dispatch     = d3.dispatch('elementDblClick','elementClick', 'elementMouseover', 'elementMouseout')
     , useVoronoi   = true
+    , showLabels = true
     ;
 
   //============================================================
@@ -363,6 +364,7 @@ nv.models.scatter = function() {
           .style('stroke-opacity', 1)
           .style('fill-opacity', .5);
 
+        if(showLabels){
       var pointLabels = groups.selectAll('text.nv-point-label').data(function(d){return d.values},pointKey);
         pointLabels.enter().append('text')
             .attr('class',function(d,i){return "nv-point-label nv-point-label"+i})
@@ -384,6 +386,7 @@ nv.models.scatter = function() {
             })
             .attr('x', function(d,i) { return nv.utils.NaNtoZero(x(getX(d,i))) })
             .attr('y', function(d,i) { return nv.utils.NaNtoZero(y(getY(d,i))) }) ;
+        }
 
         if (onlyCircles) {
 
@@ -698,6 +701,12 @@ nv.models.scatter = function() {
     if (!arguments.length) return singlePoint;
     singlePoint = _;
     return chart;
+  };
+
+  chart.showLabels = function(_){
+      if (!arguments.length) return showLabels;
+      showLabels = _;
+      return chart;
   };
 
   //============================================================
