@@ -30,7 +30,7 @@ nv.models.historicalBarWithFocusChart = function() {
     , state = {}
     , defaultState = null
     , noData = 'No Data Available.'
-    , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState','brush','startPlay','stopPlay','finishPlay')
+    , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState','brush','startPlay','stopPlay','finishPlay','brushPlaying')
     , transitionDuration = 250
       , brush =  d3.svg.brush()
       , brushExtent = null
@@ -301,6 +301,7 @@ nv.models.historicalBarWithFocusChart = function() {
 
         function updateBrushBG() {
             if (!brush.empty()) brush.extent(brushExtent);
+            var _showBrushExtent = !brush.empty() ;
             brushBG
                 .data([brush.empty() ? x.domain() : brushExtent])
                 .each(function(d,i) {
@@ -310,12 +311,12 @@ nv.models.historicalBarWithFocusChart = function() {
                     d3.select(this).select('.left')
                         .attr('width',  leftWidth < 0 ? 0 : leftWidth);
 
-                    var extentLeft = d3.select(this).select('.extent-left').text(d[0]);
+                    var extentLeft = d3.select(this).select('.extent-left').text( _showBrushExtent? xAxis.tickFormat()(d[0]):"");
                     var extentLeftWidth = +window.getComputedStyle(extentLeft[0][0]).width.replace('px','');
                     extentLeft.attr('x',x(d[0])-extentLeftWidth-10).attr('y',availableHeight*(1-0.618));
 
                     d3.select(this).select('.extent-right')
-                        .text(d[1]).attr('x',x(d[1])+10).attr('y',availableHeight*(1-0.618));
+                        .text(_showBrushExtent? xAxis.tickFormat()(d[1]):"").attr('x',x(d[1])+10).attr('y',availableHeight*(1-0.618));
 
                     d3.select(this).select('.right')
                         .attr('x', x(d[1]))
@@ -329,9 +330,16 @@ nv.models.historicalBarWithFocusChart = function() {
             if (Math.abs(extent[0] - extent[1]) <= 1) {
                 return;
             }
-            dispatch.brush({extent: extent, brush: brush});
+            dispatch.brushPlaying({extent: extent, brush: brush});
             updateBrushBG();
         }
+
+        brush.update = function (option) {
+            var extent = option && option.extent;
+            extent && brush.extent(extent);
+            gBrush.call(brush);
+            onBrush();
+        };
 
       //============================================================
       // Event Handling/Dispatching (in chart's scope)
@@ -390,7 +398,7 @@ nv.models.historicalBarWithFocusChart = function() {
 
         chart.play = function(){
 
-            var step = x.domain()[1]/data[0].values.length;
+            var step = (x.domain()[1]- x.domain()[0])/data[0].values.length;
             var end  = x.domain()[1];
 
             if( brush.empty() || brushExtent === null){
@@ -416,7 +424,7 @@ nv.models.historicalBarWithFocusChart = function() {
                 brush.extent(brushExtent);
                 gBrush.call(brush);
                 onBrush();
-                chart.playTimer = setTimeout(playstep,50);
+                chart.playTimer = setTimeout(playstep,transitionDuration+1);
             }
 
             dispatch.startPlay({brush:brush,extent:brush.extent()});
@@ -472,6 +480,8 @@ nv.models.historicalBarWithFocusChart = function() {
     'xDomain', 'yDomain', 'xRange', 'yRange', 'forceX', 'forceY', 'interactive', 'clipEdge', 'clipVoronoi', 'id', 'interpolate','highlightPoint','clearHighlights', 'interactive');
 
   chart.options = nv.utils.optionsFunc.bind(chart);
+
+  chart.brush = brush;
   
   chart.margin = function(_) {
     if (!arguments.length) return margin;
@@ -568,7 +578,7 @@ nv.models.historicalBarWithFocusChart = function() {
     return chart;
   };
 
-    chart.playMode = function(_){
+  chart.playMode = function(_){
         if (!arguments.length) return playMode;
         playMode = _;
         return chart;
