@@ -370,7 +370,7 @@ nv.models.scatter = function() {
             .style('font-family',' "Helvetica Neue", Helvetica, "Microsoft YaHei", Arial, sans-serif')
             .style('fill-opacity','1.0')
             .attr('text-anchor','middle')
-            .text(function(d){
+            .text(function(d,i){
                 return Math.sqrt(z(getSize(d,i))/Math.PI)>20? d.label:"";
             })
             .attr('dy','.32em')
@@ -379,7 +379,7 @@ nv.models.scatter = function() {
 
         pointLabels.exit().remove();
         pointLabels.transition()
-            .text(function(d){
+            .text(function(d,i){
                 return Math.sqrt(z(getSize(d,i))/Math.PI)>20? d.label:"";
             })
             .attr('x', function(d,i) { return nv.utils.NaNtoZero(x(getX(d,i))) })
