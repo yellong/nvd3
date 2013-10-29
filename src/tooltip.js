@@ -114,12 +114,12 @@ window.nv.tooltip.* also has various helper methods.
 
             while(/\[object SVG.*Element\]/g.test(body+""))body = body.parentNode;
 
-            if (chartContainer)
-                body = d3.select(body);
-            else
-                body = d3.select("body");
+            if (chartContainer){
+                body = d3.select(body);}
+            else{
+                body = d3.select("body");}
 
-
+            body = d3.select("body");
 
             var container = body.select(".nvtooltip");
             if (container.node() === null) {
