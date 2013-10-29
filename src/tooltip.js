@@ -119,7 +119,8 @@ window.nv.tooltip.* also has various helper methods.
             else{
                 body = d3.select("body");}
 
-            body = d3.select("body");
+//            //todo:always put in body！
+//            body = d3.select("body");
 
             var container = body.select(".nvtooltip");
             if (container.node() === null) {
