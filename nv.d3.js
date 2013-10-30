@@ -1831,16 +1831,14 @@ nv.models.historicalBar = function() {
               d3.event.stopPropagation();
           });
 
+      var w = availableWidth / data[0].values.length;
       bars
-          .attr('fill', function(d,i) { return color(d, i); })
-          .attr('class', function(d,i,j) { return (getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive') + ' nv-bar-' + j + '-' + i })
-          .transition()
-          .attr('transform', function(d,i) { return 'translate(' + (x(getX(d,i)) - availableWidth / data[0].values.length * .45) + ',0)'; }) 
-           //TODO: better width calculations that don't assume always uniform data spacing;w
-          .attr('width', function(d,i){
-              var w = availableWidth / data[0].values.length;
-              return ( w<=4 ? w : w-4) * .9;
-          });
+        .attr('fill', function(d,i) { return color(d, i); })
+        .attr('class', function(d,i,j) { return (getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive') + ' nv-bar-' + j + '-' + i })
+        .transition()
+        .attr('transform', function(d,i) { return 'translate(' + (x(getX(d,i)) - availableWidth / data[0].values.length * .45) + ',0)'; })
+        //TODO: better width calculations that don't assume always uniform data spacing;w
+        .attr('width', Math.min(w*.9, Math.max(w-2, 1)));
 
 
       bars.transition()
