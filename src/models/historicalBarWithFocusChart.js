@@ -250,7 +250,7 @@ nv.models.historicalBarWithFocusChart = function() {
             .attr('height', availableHeight);
         gBrush.selectAll('.resize').append('path').attr('d', resizePath);
 
-        onBrush();
+        onBrush({silent:true});
 
 
       //------------------------------------------------------------
@@ -327,13 +327,13 @@ nv.models.historicalBarWithFocusChart = function() {
                 });
         }
 
-        function onBrush() {
+        function onBrush(option) {
             brushExtent = brush.empty() ? null : brush.extent();
             var extent = brush.empty() ? x.domain() : brush.extent();
             if (Math.abs(extent[0] - extent[1]) <= 1) {
                 return;
             }
-            dispatch.brushPlaying({extent: extent, brush: brush});
+            if(option && !option.silent || !option)dispatch.brushPlaying({extent: extent, brush: brush});
             updateBrushBG();
         }
 
@@ -341,7 +341,7 @@ nv.models.historicalBarWithFocusChart = function() {
             var extent = option && option.extent;
             extent && brush.extent(extent);
             gBrush.call(brush);
-            onBrush();
+            onBrush(option);
         };
 
       //============================================================
