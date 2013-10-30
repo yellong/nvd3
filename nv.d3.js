@@ -4783,6 +4783,7 @@ nv.models.historicalBarWithFocusChart = function() {
       , brush =  d3.svg.brush()
       , brushExtent = null
       , playMode = 1
+      , showBrushExtentLabel = true
     ;
 
   xAxis
@@ -5059,12 +5060,14 @@ nv.models.historicalBarWithFocusChart = function() {
                     d3.select(this).select('.left')
                         .attr('width',  leftWidth < 0 ? 0 : leftWidth);
 
-                    var extentLeft = d3.select(this).select('.extent-left').text( _showBrushExtent? xAxis.tickFormat()(d[0]):"");
-                    var extentLeftWidth = +window.getComputedStyle(extentLeft[0][0]).width.replace('px','');
-                    extentLeft.attr('x',x(d[0])-extentLeftWidth-10).attr('y',availableHeight*(1-0.618));
+                    if(showBrushExtentLabel){
+                        var extentLeft = d3.select(this).select('.extent-left').text( _showBrushExtent? xAxis.tickFormat()(d[0]):"");
+                        var extentLeftWidth = +window.getComputedStyle(extentLeft[0][0]).width.replace('px','');
+                        extentLeft.attr('x',x(d[0])-extentLeftWidth-10).attr('y',availableHeight*(1-0.618));
 
-                    d3.select(this).select('.extent-right')
-                        .text(_showBrushExtent? xAxis.tickFormat()(d[1]):"").attr('x',x(d[1])+10).attr('y',availableHeight*(1-0.618));
+                        d3.select(this).select('.extent-right')
+                            .text(_showBrushExtent? xAxis.tickFormat()(d[1]):"").attr('x',x(d[1])+10).attr('y',availableHeight*(1-0.618));
+                    }
 
                     d3.select(this).select('.right')
                         .attr('x', x(d[1]))
@@ -5331,6 +5334,12 @@ nv.models.historicalBarWithFocusChart = function() {
         playMode = _;
         return chart;
     }
+
+  chart.showBrushExtentLabel = function(_){
+      if (!arguments.length) return showBrushExtentLabel;
+      showBrushExtentLabel = _;
+      return chart;
+  }
 
   //============================================================
 
