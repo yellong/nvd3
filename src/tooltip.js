@@ -282,29 +282,27 @@ window.nv.tooltip.* also has various helper methods.
         var   container = document.createElement('div');
         container.className = 'nvtooltip ' + (classes ? classes : 'xy-tooltip');
 
-        var body = parentContainer;
-        if ( !parentContainer || parentContainer.tagName.match(/g|svg/i)) {
-            //If the parent element is an SVG element, place tooltip in the <body> element.
-            body = document.getElementsByTagName('body')[0];
-
-            var realContainer = parentContainer;
-            if(realContainer){
-                while(/\[object SVG.*Element\]/g.test(realContainer+""))realContainer = realContainer.parentNode;
-                pos[0] += realContainer.offsetLeft;
-                pos[1] += realContainer.offsetTop;
-            }
-        }
+        var body =  document.getElementsByTagName('body')[0];
 
         var relative = false;
-          if(parentContainer){
-            var positionStyle =  window.getComputedStyle(parentContainer).position;
-            if(positionStyle === 'relative' ||  positionStyle === 'absolute'){
-                  relative = true;
-                  pos[0] -= parentContainer.offsetLeft;
-                  pos[1] -= parentContainer.offsetTop;
-            }
+
+      if (parentContainer) {
+          pos[0]-=parentContainer.offsetLeft;
+          pos[1]-=parentContainer.offsetTop;
+          pos[0]+=parentContainer.getBoundingClientRect().left;
+          pos[1]+=parentContainer.getBoundingClientRect().top;
+          var svgComp = parentContainer.getElementsByTagName("svg")[0];
+          var svgOffset = {left:0,top:0};
+          if (svgComp) {
+              var svgBound = svgComp.getBoundingClientRect();
+              var chartBound = parentContainer.getBoundingClientRect();
+              svgOffset.top = svgBound.top - chartBound.top;
+              svgOffset.left = svgBound.left - chartBound.left;
           }
-   
+          pos[0] += svgOffset.left ;
+          pos[1] += svgOffset.top ;
+      }
+
         container.style.left = 0;
         container.style.top = 0;
         container.style.opacity = 0;

@@ -627,29 +627,27 @@ window.nv.tooltip.* also has various helper methods.
         var   container = document.createElement('div');
         container.className = 'nvtooltip ' + (classes ? classes : 'xy-tooltip');
 
-        var body = parentContainer;
-        if ( !parentContainer || parentContainer.tagName.match(/g|svg/i)) {
-            //If the parent element is an SVG element, place tooltip in the <body> element.
-            body = document.getElementsByTagName('body')[0];
-
-            var realContainer = parentContainer;
-            if(realContainer){
-                while(/\[object SVG.*Element\]/g.test(realContainer+""))realContainer = realContainer.parentNode;
-                pos[0] += realContainer.offsetLeft;
-                pos[1] += realContainer.offsetTop;
-            }
-        }
+        var body =  document.getElementsByTagName('body')[0];
 
         var relative = false;
-          if(parentContainer){
-            var positionStyle =  window.getComputedStyle(parentContainer).position;
-            if(positionStyle === 'relative' ||  positionStyle === 'absolute'){
-                  relative = true;
-                  pos[0] -= parentContainer.offsetLeft;
-                  pos[1] -= parentContainer.offsetTop;
-            }
+
+      if (parentContainer) {
+          pos[0]-=parentContainer.offsetLeft;
+          pos[1]-=parentContainer.offsetTop;
+          pos[0]+=parentContainer.getBoundingClientRect().left;
+          pos[1]+=parentContainer.getBoundingClientRect().top;
+          var svgComp = parentContainer.getElementsByTagName("svg")[0];
+          var svgOffset = {left:0,top:0};
+          if (svgComp) {
+              var svgBound = svgComp.getBoundingClientRect();
+              var chartBound = parentContainer.getBoundingClientRect();
+              svgOffset.top = svgBound.top - chartBound.top;
+              svgOffset.left = svgBound.left - chartBound.left;
           }
-   
+          pos[0] += svgOffset.left ;
+          pos[1] += svgOffset.top ;
+      }
+
         container.style.left = 0;
         container.style.top = 0;
         container.style.opacity = 0;
@@ -4590,7 +4588,7 @@ nv.models.historicalBarChart = function() {
 
       dispatch.on('tooltipShow', function(e) {
           if (tooltips){
-              e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+
               showTooltip(e, that.parentNode);
           }
       });
@@ -5128,7 +5126,7 @@ nv.models.historicalBarWithFocusChart = function() {
 
       dispatch.on('tooltipShow', function(e) {
           if (tooltips){
-              e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+
               showTooltip(e, that.parentNode);
           }
       });
@@ -7897,7 +7895,7 @@ nv.models.lineWithFocusChart2 = function () {
             var bindTooltipShow = function(){
                 line.dispatch.on('tooltipShow', function(e) {
                     if (tooltips){
-                        e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+
                         console.log(e.pos);
                         showTooltip(e, that.parentNode);
                     }
@@ -9461,7 +9459,7 @@ nv.models.multiBarChart = function() {
 
       dispatch.on('tooltipShow', function(e) {
           if (tooltips){
-              e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+
               showTooltip(e, that.parentNode);
           }
       });
@@ -10365,7 +10363,7 @@ nv.models.multiBarHorizontalChart = function() {
 
       dispatch.on('tooltipShow', function(e) {
         if (tooltips){
-            e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+
             showTooltip(e, that.parentNode);
         }
 
@@ -13699,8 +13697,8 @@ nv.models.scatterChart = function() {
     var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
         top = e.pos[1] + ( offsetElement.offsetTop || 0),
         leftX = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
-        topX = y.range()[0] + margin.top + (e.pos[3] || 0) + ( offsetElement.offsetTop || 0),
-        leftY = x.range()[0] + margin.left + (e.pos[2] || 0) + ( offsetElement.offsetLeft || 0 ),
+        topX = y.range()[0] + margin.top  + ( offsetElement.offsetTop || 0),
+        leftY = x.range()[0] + margin.left  + ( offsetElement.offsetLeft || 0 ),
         topY = e.pos[1] + ( offsetElement.offsetTop || 0),
         xVal = xAxis.tickFormat()(scatter.x()(e.point, e.pointIndex)),
         yVal = yAxis.tickFormat()(scatter.y()(e.point, e.pointIndex));
@@ -14037,7 +14035,6 @@ nv.models.scatterChart = function() {
 
       dispatch.on('tooltipShow', function(e) {
             if (tooltips){
-                e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0) , that.offsetLeft , that.offsetTop];
                 showTooltip(e, that.parentNode);
             }
       });
@@ -16499,7 +16496,7 @@ nv.models.stackedAreaWithFocusChart = function () {
             var bindTooltipShow = function(){
                 area.dispatch.on('tooltipShow', function(e) {
                     if (tooltips){
-                        e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+
                         showTooltip(e, that.parentNode);
                     }
                 });

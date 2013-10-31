@@ -195,7 +195,7 @@ nv.models.lineWithFocusChart2 = function () {
             var bindTooltipShow = function(){
                 line.dispatch.on('tooltipShow', function(e) {
                     if (tooltips){
-                        e.pos = [ e.pos[0] + (e.value < 0 ?-that.offsetLeft:that.offsetLeft || 0) , e.pos[1] + (that.offsetTop || 0)];
+
                         console.log(e.pos);
                         showTooltip(e, that.parentNode);
                     }
