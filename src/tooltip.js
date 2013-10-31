@@ -402,7 +402,7 @@ window.nv.tooltip.* also has various helper methods.
                 if (tTop + height > scrollTop + windowHeight) top = scrollTop + windowHeight - tTop + top - height;
                 break;
               case 'n':
-                left = pos[0] - (width / 2) - 5;
+                left = pos[0] - (width / 2) ;
                 top = pos[1] + dist;
                 var tLeft = tooltipLeft(container);
                 var tTop = tooltipTop(container);
