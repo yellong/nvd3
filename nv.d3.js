@@ -13277,7 +13277,7 @@ nv.models.scatter = function() {
             .style('fill-opacity','1.0')
             .attr('text-anchor','middle')
             .text(function(d,i){
-                return Math.sqrt(z(getSize(d,i))/Math.PI)>20? d.label:"";
+                return Math.sqrt(z(getSize(d,i))/Math.PI)>12? d.label:"";
             })
             .attr('dy','.32em')
             .attr('x', function(d,i) { return nv.utils.NaNtoZero(x(getX(d,i))) })
@@ -13286,7 +13286,7 @@ nv.models.scatter = function() {
         pointLabels.exit().remove();
         pointLabels.transition()
             .text(function(d,i){
-                return Math.sqrt(z(getSize(d,i))/Math.PI)>20? d.label:"";
+                return Math.sqrt(z(getSize(d,i))/Math.PI)>12? d.label:"";
             })
             .attr('x', function(d,i) { return nv.utils.NaNtoZero(x(getX(d,i))) })
             .attr('y', function(d,i) { return nv.utils.NaNtoZero(y(getY(d,i))) }) ;
