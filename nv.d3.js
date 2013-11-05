@@ -4783,6 +4783,8 @@ nv.models.historicalBarWithFocusChart = function() {
       , brushExtent = null
       , playMode = 1
       , showBrushExtentLabel = true
+      , step = function( _xDomain,data ){ return (_xDomain[1]- _xDomain[0])/data.length; }
+      , initStep = function(brushStep){ return 4*brushStep; }
     ;
 
   xAxis
@@ -5080,7 +5082,13 @@ nv.models.historicalBarWithFocusChart = function() {
             if (Math.abs(extent[0] - extent[1]) <= 1) {
                 return;
             }
-            if(option && !option.silent || !option)dispatch.brushPlaying({extent: extent, brush: brush});
+            if(option && !option.silent || !option){
+                if(chart.playTimer===null){
+                    dispatch.brush({extent: extent, brush: brush});
+                }else{
+                    dispatch.brushPlaying({extent: extent, brush: brush});
+                }
+            }
             updateBrushBG();
         }
 
@@ -5147,12 +5155,14 @@ nv.models.historicalBarWithFocusChart = function() {
 
 
         chart.play = function(){
+            clearTimeout(chart.playTimer);
+            chart.playTimer = null;
 
-            var step = (x.domain()[1]- x.domain()[0])/data[0].values.length;
+            var brushStep = step(x.domain(),data[0].values);
             var end  = x.domain()[1];
 
             if( brush.empty() || brushExtent === null){
-                brushExtent = [ x.domain()[0], x.domain()[0]+(playMode?step:2*step) ];
+                brushExtent = [ x.domain()[0], x.domain()[0]+(playMode?brushStep:initStep(brushStep)) ];
             }
             if( brushExtent[1] >= end ){
                 brushExtent = playMode?[ brushExtent[0], brushExtent[0] ]:[ x.domain()[0], x.domain()[0] + brushExtent[1]- brushExtent[0] ];
@@ -5167,10 +5177,12 @@ nv.models.historicalBarWithFocusChart = function() {
                     },0);
                     return;
                 }
-                if(brushExtent[1] + step >= end){
-                   step = end - brushExtent[1];
+                if(brushExtent[1] + brushStep >= end){
+                   brushStep =  end - brushExtent[1];
+                }else{
+                   brushStep = step(x.domain(),data[0].values);
                 }
-                brushExtent = [ playMode?brushExtent[0]:brushExtent[0]+=step , brushExtent[1]+=step ];
+                brushExtent = [ playMode?brushExtent[0]:brushExtent[0]+=brushStep , brushExtent[1]+=brushStep ];
                 brush.extent(brushExtent);
                 gBrush.call(brush);
                 onBrush();
@@ -5303,6 +5315,18 @@ nv.models.historicalBarWithFocusChart = function() {
     tooltip = _;
     return chart;
   };
+
+    chart.step = function(_) {
+        if (!arguments.length) return step;
+        step = _;
+        return chart;
+    };
+
+    chart.initStep = function(_) {
+        if (!arguments.length) return initStep;
+        initStep = _;
+        return chart;
+    };
 
   chart.state = function(_) {
     if (!arguments.length) return state;

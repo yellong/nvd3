@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <link href="../src/nv.d3.css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="http://cdn.staticfile.org/jqueryui/1.10.3/css/base/jquery-ui.css"/>
 <style>
 
 body {
@@ -15,9 +16,18 @@ text {
 <body class='with-3d-shadow with-transitions'>
 
 <div style="width: 100%; height: 400px;">
-<h4><a id="play" href="###">播放</a></h4>
+<h4><a id="play-1"  href="###">播放模式1</a>
+<a id="play-0" href="###">播放模式0</a>
+<a id="stop" href="###">暂停</a>
+
+播放速度:<span style="display:inline-block ;width:300px;padding: 3px;margin-left: 20px">
+        <div id="slider"></div>
+</span>
+</h4>
 <svg id="test1"></svg>
 </div>
+<script type="text/javascript" src="http://cdn.staticfile.org/jquery/2.0.3/jquery.js"></script>
+<script type="text/javascript" src="http://cdn.staticfile.org/jqueryui/1.10.3/jquery-ui.min.js"></script>
 <script src="../lib/d3.v3.js"></script>
 <script src="../nv.d3.js"></script>
 <script src="../src/models/axis.js"></script>
@@ -28,8 +38,14 @@ text {
 <script> 
 
 var chart;
-var playBtn = document.querySelector('#play');
+var $silder = $( "#slider" ).slider();
+var playBtn_0 = document.querySelector('#play-0');
+var playBtn_1 = document.querySelector('#play-1');
+var stopBtn  = document.querySelector('#stop');
 var playing = false;
+var speed = 1;
+var speedScale = d3.scale.linear().domain([1,100]).range([250,50]);
+speedScale.clamp(true);
 
 nv.addGraph(function() {
   chart = nv.models.historicalBarWithFocusChart();
@@ -64,27 +80,27 @@ nv.addGraph(function() {
   chart.dispatch.on('brush',function(brushObject){
   })
 
-  chart.dispatch.on('finishPlay',function(){
-      playing = false;
-      playBtn.innerHTML = '播放';
-  });
-
   return chart;
 });
 
+$silder.on('slide',function(event,ui){
+    speed = speedScale(ui.value);
+    chart.transitionDuration(speed);
+})
 
-playBtn.addEventListener('click',function(){
-    playing = !playing;
-    if(playing){
-        chart.playMode(1);
-        chart.play();
-        this.innerHTML = '暂停';
-    }else{
-        chart.stop();
-        this.innerHTML = '播放';
-    }
-},false);
+playBtn_0.addEventListener('click',function(){
+    chart.playMode(0);
+    chart.play();
+});
 
+playBtn_1.addEventListener('click',function(){
+    chart.playMode(1);
+    chart.play();
+})
+
+stopBtn.addEventListener('click',function(){
+    chart.stop();
+})
 
 //Simple test data generators
 
