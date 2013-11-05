@@ -406,8 +406,10 @@ nv.models.historicalBarWithFocusChart = function() {
         selection.call(chart);
       });
 
+        chart.playTimer = null;
 
         chart.play = function(){
+
             clearTimeout(chart.playTimer);
             chart.playTimer = null;
 
