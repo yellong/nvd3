@@ -5175,6 +5175,7 @@ nv.models.historicalBarWithFocusChart = function() {
                     clearTimeout(chart.playTimer);
                     chart.playTimer = null;
                     setTimeout(function(){
+                        dispatch.stopPlay({brush:brush,extent:brush.extent()});
                         dispatch.finishPlay({brush:brush,extent:brush.extent()});
                     },0);
                     return;
