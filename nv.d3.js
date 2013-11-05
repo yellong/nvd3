@@ -5188,8 +5188,8 @@ nv.models.historicalBarWithFocusChart = function() {
                 brushExtent = [ playMode?brushExtent[0]:brushExtent[0]+=brushStep , brushExtent[1]+=brushStep ];
                 brush.extent(brushExtent);
                 gBrush.call(brush);
-                onBrush();
                 chart.playTimer = setTimeout(playstep,transitionDuration+1);
+                onBrush();
             }
 
             dispatch.startPlay({brush:brush,extent:brush.extent()});
