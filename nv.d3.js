@@ -8037,14 +8037,14 @@ nv.models.lineWithBrushChart = function() {
     // Public Variables with Default Settings
     //------------------------------------------------------------
 
-    var bars = nv.models.line()
+    var lines = nv.models.line()
         , xAxis = nv.models.axis()
         , yAxis = nv.models.axis()
         , legend = nv.models.legend()
+        , interactiveLayer = nv.interactiveGuideline()
         ;
 
-
-    var margin = {top: 30, right: 90, bottom: 50, left: 90}
+    var margin = {top: 30, right: 20, bottom: 50, left: 60}
         , color = nv.utils.defaultColor()
         , width = null
         , height = null
@@ -8052,6 +8052,7 @@ nv.models.lineWithBrushChart = function() {
         , showXAxis = true
         , showYAxis = true
         , rightAlignYAxis = false
+        , useInteractiveGuideline = false
         , tooltips = true
         , tooltip = function(key, x, y, e, graph) {
             return '<h3>' + key + '</h3>' +
@@ -8077,7 +8078,7 @@ nv.models.lineWithBrushChart = function() {
         .tickPadding(7)
     ;
     yAxis
-        .orient( (rightAlignYAxis) ? 'right' : 'left')
+        .orient((rightAlignYAxis) ? 'right' : 'left')
     ;
 
     //============================================================
@@ -8103,14 +8104,15 @@ nv.models.lineWithBrushChart = function() {
 
         var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
             top = e.pos[1] + ( offsetElement.offsetTop || 0),
-            x = xAxis.tickFormat()(bars.x()(e.point, e.pointIndex)),
-            y = yAxis.tickFormat()(bars.y()(e.point, e.pointIndex)),
+            x = xAxis.tickFormat()(lines.x()(e.point, e.pointIndex)),
+            y = yAxis.tickFormat()(lines.y()(e.point, e.pointIndex)),
             content = tooltip(e.series.key, x, y, e, chart);
 
         nv.tooltip.show([left, top], content, null, null, offsetElement);
     };
 
     //============================================================
+
 
     function chart(selection) {
         selection.each(function(data) {
@@ -8128,6 +8130,7 @@ nv.models.lineWithBrushChart = function() {
 
             //set state.disabled
             state.disabled = data.map(function(d) { return !!d.disabled });
+
 
             if (!defaultState) {
                 var key;
@@ -8167,8 +8170,8 @@ nv.models.lineWithBrushChart = function() {
             //------------------------------------------------------------
             // Setup Scales
 
-            x = bars.xScale();
-            y = bars.yScale();
+            x = lines.xScale();
+            y = lines.yScale();
 
             //------------------------------------------------------------
 
@@ -8176,20 +8179,19 @@ nv.models.lineWithBrushChart = function() {
             //------------------------------------------------------------
             // Setup containers and skeleton of chart
 
-            var wrap = container.selectAll('g.nv-wrap.nv-historicalBarChart').data([data]);
-            var gEnter = wrap.enter().append('g').attr('class', 'nvd3 nv-wrap nv-historicalBarChart').append('g');
+            var wrap = container.selectAll('g.nv-wrap.nv-lineWithBrushChart').data([data]);
+            var gEnter = wrap.enter().append('g').attr('class', 'nvd3 nv-wrap nv-lineWithBrushChart').append('g');
             var g = wrap.select('g');
 
             gEnter.append('g').attr('class', 'nv-x nv-axis');
             gEnter.append('g').attr('class', 'nv-y nv-axis');
-            gEnter.append('g').attr('class', 'nv-barsWrap');
+            gEnter.append('g').attr('class', 'nv-linesWrap');
+            gEnter.append('g').attr('class', 'nv-interactive');
             gEnter.append('g').attr('class', 'nv-legendWrap');
             gEnter.append('g').attr('class', 'nv-brushBackground');
             gEnter.append('g').attr('class', 'nv-x nv-brush');
 
-            //------------------------------------------------------------
-
-
+            g.select("rect").attr("width",availableWidth).attr("height",availableHeight);
             //------------------------------------------------------------
             // Legend
 
@@ -8219,11 +8221,24 @@ nv.models.lineWithBrushChart = function() {
                     .attr("transform", "translate(" + availableWidth + ",0)");
             }
 
-
             //------------------------------------------------------------
             // Main Chart Component(s)
 
-            bars
+
+            //------------------------------------------------------------
+            //Set up interactive layer
+            if (useInteractiveGuideline) {
+                interactiveLayer
+                    .width(availableWidth)
+                    .height(availableHeight)
+                    .margin({left:margin.left, top:margin.top})
+                    .svgContainer(container)
+                    .xScale(x);
+                wrap.select(".nv-interactive").call(interactiveLayer);
+            }
+
+
+            lines
                 .width(availableWidth)
                 .height(availableHeight)
                 .color(data.map(function(d,i) {
@@ -8231,10 +8246,10 @@ nv.models.lineWithBrushChart = function() {
                 }).filter(function(d,i) { return !data[i].disabled }));
 
 
-            var barsWrap = g.select('.nv-barsWrap')
+            var linesWrap = g.select('.nv-linesWrap')
                 .datum(data.filter(function(d) { return !d.disabled }))
 
-            barsWrap.transition().call(bars);
+            linesWrap.transition().call(lines);
 
             //------------------------------------------------------------
 
@@ -8293,6 +8308,7 @@ nv.models.lineWithBrushChart = function() {
             if (showXAxis) {
                 xAxis
                     .scale(x)
+                    .ticks( availableWidth / 100 )
                     .tickSize(-availableHeight, 0);
 
                 g.select('.nv-x.nv-axis')
@@ -8417,11 +8433,54 @@ nv.models.lineWithBrushChart = function() {
                 chart.update();
             });
 
-            dispatch.on('tooltipShow', function(e) {
-                if (tooltips){
+            interactiveLayer.dispatch.on('elementMousemove', function(e) {
+                lines.clearHighlights();
+                var singlePoint, pointIndex, pointXLocation, allData = [];
+                data
+                    .filter(function(series, i) {
+                        series.seriesIndex = i;
+                        return !series.disabled;
+                    })
+                    .forEach(function(series,i) {
+                        pointIndex = nv.interactiveBisect(series.values, e.pointXValue, chart.x());
+                        lines.highlightPoint(i, pointIndex, true);
+                        var point = series.values[pointIndex];
+                        if (typeof point === 'undefined') return;
+                        if (typeof singlePoint === 'undefined') singlePoint = point;
+                        if (typeof pointXLocation === 'undefined') pointXLocation = chart.xScale()(chart.x()(point,pointIndex));
+                        allData.push({
+                            key: series.key,
+                            value: chart.y()(point, pointIndex),
+                            color: color(series,series.seriesIndex)
+                        });
+                    });
 
-                    showTooltip(e, that.parentNode);
-                }
+                var xValue = xAxis.tickFormat()(chart.x()(singlePoint,pointIndex));
+                interactiveLayer.tooltip
+                    .position({left: pointXLocation + margin.left, top: e.mouseY + margin.top})
+                    .chartContainer(that.parentNode)
+                    .enabled(tooltips)
+                    .valueFormatter(function(d,i) {
+                        return yAxis.tickFormat()(d);
+                    })
+                    .data(
+                    {
+                        value: xValue,
+                        series: allData
+                    }
+                )();
+
+                interactiveLayer.renderGuideLine(pointXLocation);
+
+            });
+
+            interactiveLayer.dispatch.on("elementMouseout",function(e) {
+                dispatch.tooltipHide();
+                lines.clearHighlights();
+            });
+
+            dispatch.on('tooltipShow', function(e) {
+                if (tooltips) showTooltip(e, that.parentNode);
             });
 
 
@@ -8435,7 +8494,7 @@ nv.models.lineWithBrushChart = function() {
                     state.disabled = e.disabled;
                 }
 
-                selection.call(chart);
+                chart.update();
             });
 
             chart.playTimer = null;
@@ -8499,12 +8558,12 @@ nv.models.lineWithBrushChart = function() {
     // Event Handling/Dispatching (out of chart's scope)
     //------------------------------------------------------------
 
-    bars.dispatch.on('elementMouseover.tooltip', function(e) {
+    lines.dispatch.on('elementMouseover.tooltip', function(e) {
         e.pos = [e.pos[0] +  margin.left, e.pos[1] + margin.top];
         dispatch.tooltipShow(e);
     });
 
-    bars.dispatch.on('elementMouseout.tooltip', function(e) {
+    lines.dispatch.on('elementMouseout.tooltip', function(e) {
         dispatch.tooltipHide(e);
     });
 
@@ -8521,12 +8580,12 @@ nv.models.lineWithBrushChart = function() {
 
     // expose chart's sub-components
     chart.dispatch = dispatch;
-    chart.bars = bars;
+    chart.lines = lines;
     chart.legend = legend;
     chart.xAxis = xAxis;
     chart.yAxis = yAxis;
 
-    d3.rebind(chart, bars, 'defined', 'isArea', 'x', 'y', 'size', 'xScale', 'yScale',
+    d3.rebind(chart, lines, 'defined', 'isArea', 'x', 'y', 'size', 'xScale', 'yScale',
         'xDomain', 'yDomain', 'xRange', 'yRange', 'forceX', 'forceY', 'interactive', 'clipEdge', 'clipVoronoi', 'id', 'interpolate','highlightPoint','clearHighlights', 'interactive');
 
     chart.options = nv.utils.optionsFunc.bind(chart);
@@ -8589,6 +8648,16 @@ nv.models.lineWithBrushChart = function() {
         if(!arguments.length) return rightAlignYAxis;
         rightAlignYAxis = _;
         yAxis.orient( (_) ? 'right' : 'left');
+        return chart;
+    };
+
+    chart.useInteractiveGuideline = function(_) {
+        if(!arguments.length) return useInteractiveGuideline;
+        useInteractiveGuideline = _;
+        if (_ === true) {
+            chart.interactive(false);
+            chart.useVoronoi(false);
+        }
         return chart;
     };
 
