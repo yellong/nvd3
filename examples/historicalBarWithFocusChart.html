@@ -20,9 +20,7 @@ text {
 <a id="play-0" href="###">播放模式0</a>
 <a id="stop" href="###">暂停</a>
 
-播放速度:<span style="display:inline-block ;width:300px;padding: 3px;margin-left: 20px">
-        <div id="slider"></div>
-</span>
+播放速度:<span id="slider" style="display:inline-block ;width:300px;padding: 3px;margin-left: 20px"></span>
 </h4>
 <svg id="test1"></svg>
 </div>
@@ -44,7 +42,7 @@ var playBtn_1 = document.querySelector('#play-1');
 var stopBtn  = document.querySelector('#stop');
 var playing = false;
 var speed = 1;
-var speedScale = d3.scale.linear().domain([1,100]).range([250,50]);
+var speedScale = d3.scale.linear().domain([1,100]).range([1,3.5]);
 speedScale.clamp(true);
 
 nv.addGraph(function() {
@@ -53,6 +51,9 @@ nv.addGraph(function() {
     .margin({left: 100, bottom: 100})
     .x(function(d,i) { return i })
     .transitionDuration(250)
+          .step(function(domain,data){
+              return speed*(domain[1]-domain[0])/data.length;
+          })
     ;
 
   // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
@@ -85,7 +86,6 @@ nv.addGraph(function() {
 
 $silder.on('slide',function(event,ui){
     speed = speedScale(ui.value);
-    chart.transitionDuration(speed);
 })
 
 playBtn_0.addEventListener('click',function(){
